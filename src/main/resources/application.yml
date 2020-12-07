@@ -1,4 +1,10 @@
-storageDirectory: resources/storage/
+storageDirectory: /home/microsfs/storage
+master:
+  ip: 172.17.0.81
+  port: 9092
+  url:
+    active: api/node/active
+    register: api/node/register
 
 server:
   port: 9096

@@ -2,6 +2,7 @@ package net.wenz.service.fsnode.core;
 
 import net.wenz.service.fsnode.model.vo.Notice;
 import net.wenz.service.fsnode.utils.MachineUtil;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,15 @@ import java.util.Map;
 @Component
 public class ActiveTask {
 
+    @Value("${master.ip}")
+    private String masterIp;
+
+    @Value("${master.port}")
+    private long masterPort;
+
+    @Value("${master.url.active}")
+    private String masterActiveURL;
+
     // 固定间隔时间执行, 方法执行完成后, 按照间隔时间点再次执行该方法
     // 比如方法执行5s, 定时间隔为3s, 则中间有一次执行不上, 从第6s开始下一次执行
     @Scheduled(cron = "0/600 * * * * *")
@@ -28,7 +38,7 @@ public class ActiveTask {
 //        RestTemplate restTemplate = new RestTemplate();
 //        ResponseEntity<Notice> entity = restTemplate.getForEntity("http://127.0.0.1:9092/node/active?mcode={mcode}", Notice.class, map);
 
-        String url = "http://127.0.0.1:9092/api/node/active";
+        String url = String.format("http://%s:%d/%s", masterIp, masterPort, masterActiveURL);
         MultiValueMap<String, String> map= new LinkedMultiValueMap<String, String>();
         map.add("mcode", mcode);
         HttpHeaders headers = new HttpHeaders();

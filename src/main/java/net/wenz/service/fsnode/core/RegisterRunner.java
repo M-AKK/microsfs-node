@@ -2,9 +2,8 @@ package net.wenz.service.fsnode.core;
 
 import net.wenz.service.fsnode.model.vo.Notice;
 import net.wenz.service.fsnode.utils.MachineUtil;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -14,11 +13,17 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @Component
 public class RegisterRunner implements CommandLineRunner {
+
+    @Value("${master.ip}")
+    private String masterIp;
+
+    @Value("${master.port}")
+    private long masterPort;
+
+    @Value("${master.url.register}")
+    private String masterRegisterURL;
 
     @Override
     public void run(String... strings) throws Exception {
@@ -31,8 +36,8 @@ public class RegisterRunner implements CommandLineRunner {
 //        RestTemplate restTemplate = new RestTemplate();
 //        ResponseEntity<Notice> entity = restTemplate.postForEntity("http://127.0.0.1:9092/api/node/register?mcode={mcode}&port={port}", Notice.class, map);
 
-        String url = "http://127.0.0.1:9092/api/node/register";
-        MultiValueMap<String, String> map= new LinkedMultiValueMap<String, String>();
+        String url = String.format("http://%s:%d/%s", masterIp, masterPort, masterRegisterURL);
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
         map.add("mcode", mcode);
         map.add("port", "9096");
         HttpHeaders headers = new HttpHeaders();
@@ -44,6 +49,6 @@ public class RegisterRunner implements CommandLineRunner {
 
 //        HttpStatus statusCode = entity.getStatusCode();
         Notice body = entity.getBody();
-        System.out.println("register.getBody(): "+body.getList());
+        System.out.println("register.getBody(): " + body.getList());
     }
 }
